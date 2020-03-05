@@ -1,8 +1,16 @@
 import java.util.Map;
 
+
+
+
+
+//structure
+
+// we use Dictionary for finding User(by name)
 public class User {
     public String name;
     private String pass;
+    public int lastIndexGame;
 
     public User(String name, String pass) {
         this.name = name;
