@@ -1,0 +1,2 @@
+public class GameRoom {
+}
