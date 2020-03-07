@@ -1,3 +1,5 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,6 +14,8 @@ public class User {
     public String name;
     public int lastIndexGame; // show that last game that player was there
     public Player player = null; // اگر توی بازی نباشه باید null شود
+    public DataOutputStream output;
+    public DataInputStream input;
 
     private String pass;//it will remove when use database
 
@@ -20,6 +24,27 @@ public class User {
         this.name = name;
         this.pass = pass;
         users.put(name, this);
+    }
+
+    public User(String name, String pass,DataInputStream input , DataOutputStream output) {
+        this.name = name;
+        this.pass = pass;
+        this.input = input;
+        this.output = output;
+        users.put(name, this);
+    }
+
+    public Boolean checkPass(String pass){
+        if(this.pass == pass){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public void socketConfigUser(DataInputStream input , DataOutputStream output){
+        this.output = output;
+        this.input = input;
     }
 
     public static User checkInList(Map map, String name) {

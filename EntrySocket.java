@@ -42,17 +42,49 @@ class ClientThreads implements Runnable { // this class use just for making thre
     public ClientThreads(Socket socket) throws IOException {
         this.socket = socket;
         input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()) );
+        output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
     }
 
     @Override
     public void run() {
         //in this section check user and pass and make User or find it in list
+        String[] startTalk = reader(input).split(";");   //   login;user;pass   => eg : login;amirkashi;123456
+        if (checkUserAndAdd(startTalk[1], startTalk[2]) == null) {
+            try {
+                transmitter(output, "WrongLogin");
+                input.close();
+                output.close();
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            transmitter(output, "Accepted");
+        }
 
 
     }
 
-    public static String reader(DataInputStream in) {
+
+    public User checkUserAndAdd(String username, String pass) {
+        User currnetUser = User.users.get(username);
+        if (currnetUser != null) {
+            currnetUser = new User(username, pass, input, output);
+            User.users.put(username, currnetUser);
+            return currnetUser;
+        } else {
+            if (currnetUser.checkPass(pass)) {
+                currnetUser.socketConfigUser(input, output);
+                return currnetUser;
+            } else {
+                return null;
+            }
+        }
+    }
+
+
+    public static String reader(DataInputStream in) { // receiver need to recognize size of input in first of communication
         try {
 
             int length = in.readInt();
@@ -76,7 +108,6 @@ class ClientThreads implements Runnable { // this class use just for making thre
                     end = true;
                 }
             }
-            System.out.print("");
             System.out.println(dataString);
             return dataString.toString();
 
@@ -87,4 +118,12 @@ class ClientThreads implements Runnable { // this class use just for making thre
         return null;
     }
 
+    public static void transmitter(DataOutputStream out, String massage) { // server dont say length of massage and client will handle this
+        try {
+            byte[] dataInBytes = massage.getBytes(StandardCharsets.UTF_8);
+            out.write(dataInBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
