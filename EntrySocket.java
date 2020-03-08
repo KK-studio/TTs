@@ -60,6 +60,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
             }
 
         } else {
+            ActiveUserThread(checkUserAndAdd(startTalk[1], startTalk[2]));  // now we run menu thread for user 
             transmitter(output, "Accepted");
         }
 
@@ -81,6 +82,13 @@ class ClientThreads implements Runnable { // this class use just for making thre
                 return null;
             }
         }
+    }
+
+    public void ActiveUserThread(User user){
+        Thread thread = new Thread(user);
+        thread.start();
+        System.out.println("user process is activated");
+
     }
 
 

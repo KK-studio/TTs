@@ -9,7 +9,7 @@ import java.util.Set;
 //structure
 
 // we use Dictionary for finding User(by name)
-public class User {
+public class User implements Runnable{
     public static Map<String, User> users = new HashMap<>(); //data structure for users
     public String name;
     public int lastIndexGame; // show that last game that player was there
@@ -51,6 +51,8 @@ public class User {
         return (User) map.get(name);
     }
 
+
+
     public synchronized void join() {
         player = new Player(name);
         //می شود برای پیدا کردن بازی خالی با اضافه کردن صف اضاف مدت زمان را پایین آورد
@@ -69,6 +71,11 @@ public class User {
         this.lastIndexGame = newGame.index;
         player.setMyRoom(newGame);
         return;
+
+    }
+
+    @Override
+    public void run() {
 
     }
 }
