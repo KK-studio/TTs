@@ -13,7 +13,7 @@ public class EntrySocket {
     public void startServer(int port) {
         // starts server and waits for a connection
         try {
-            server = new ServerSocket(port);
+            server = new ServerSocket(5000);
             System.out.println("Server started");
             while (true) {
                 System.out.println("Waiting for a client ...");
@@ -52,6 +52,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
         if (checkUserAndAdd(startTalk[1], startTalk[2]) == null) {
             try {
                 transmitter(output, "WrongLogin");
+                System.out.println("wrong login");
                 input.close();
                 output.close();
                 socket.close();
@@ -130,6 +131,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
         try {
             byte[] dataInBytes = massage.getBytes(StandardCharsets.UTF_8);
             out.write(dataInBytes);
+            out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
