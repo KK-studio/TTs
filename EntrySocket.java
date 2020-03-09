@@ -10,7 +10,7 @@ public class EntrySocket {
     private ServerSocket server = null;
     private DataInputStream in = null;
 
-    public void StartServer(int port) {
+    public void startServer(int port) {
         // starts server and waits for a connection
         try {
             server = new ServerSocket(port);
@@ -19,8 +19,8 @@ public class EntrySocket {
                 System.out.println("Waiting for a client ...");
                 socket = server.accept();
                 System.out.println("Client accepted");
-                //   Thread objec = new Thread(new handler(socket,server));
-                //  objec.start();
+                Thread client = new Thread(new ClientThreads(socket));
+                client.start();
 
 
             }
@@ -60,8 +60,8 @@ class ClientThreads implements Runnable { // this class use just for making thre
             }
 
         } else {
-            ActiveUserThread(checkUserAndAdd(startTalk[1], startTalk[2]));  // now we run menu thread for user 
             transmitter(output, "Accepted");
+            ActiveUserThread(checkUserAndAdd(startTalk[1], startTalk[2]));  // now we run menu thread for user
         }
 
 
@@ -70,7 +70,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
 
     public User checkUserAndAdd(String username, String pass) {
         User currnetUser = User.users.get(username);
-        if (currnetUser != null) {
+        if (currnetUser == null) {
             currnetUser = new User(username, pass, input, output);
             User.users.put(username, currnetUser);
             return currnetUser;

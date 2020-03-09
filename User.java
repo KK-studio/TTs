@@ -53,13 +53,12 @@ public class User implements Runnable{
 
 
 
-    public synchronized void join() {
+    public synchronized void joinToRoom() {
         player = new Player(name);
         //می شود برای پیدا کردن بازی خالی با اضافه کردن صف اضاف مدت زمان را پایین آورد
-        for (Integer roomNum : GameRoom.games.keySet()) {
-            //check that we have empty space in games or not
+        for (Integer roomNum : GameRoom.games.keySet()) {  //check that we have empty space in games or not
             if (GameRoom.games.get(roomNum).currentState == 0 && GameRoom.sizeRoom > GameRoom.games.get(roomNum).players.size()) {
-                GameRoom.games.get(roomNum).players.add(player);//add to match
+                GameRoom.games.get(roomNum).addUserIngame(player);//add to match
                 this.lastIndexGame = GameRoom.games.get(roomNum).index;
                 player.setMyRoom(GameRoom.games.get(roomNum));
                 return;
@@ -76,6 +75,8 @@ public class User implements Runnable{
 
     @Override
     public void run() {
+        //todo
+        //فعلا برای  راحتی کار و اینکه منو نداریم یه ضرب می رود تو بازی
 
     }
 }

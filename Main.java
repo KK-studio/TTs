@@ -16,7 +16,8 @@ public class Main {
 //            System.out.println(((User)test.get(name)).name);
 //
 //        }
-
+        EntrySocket entrySocket = new EntrySocket();
+        entrySocket.startServer(5000);
 
 	// write your code here
     }
