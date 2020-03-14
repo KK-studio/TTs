@@ -53,17 +53,16 @@ public class User implements Runnable{
 
 
 
-    public synchronized void joinToRoom() {
-        player = new Player(name);
+    public synchronized void joinToRoom() {  //join is synchronous because prevent some problems start of match making
+        player = new Player(name,input,output);
         //می شود برای پیدا کردن بازی خالی با اضافه کردن صف اضاف مدت زمان را پایین آورد
         for (Integer roomNum : GameRoom.games.keySet()) {  //check that we have empty space in games or not
             if (GameRoom.games.get(roomNum).currentState == 0 && GameRoom.sizeRoom > GameRoom.games.get(roomNum).players.size()) {
                 GameRoom.games.get(roomNum).addUserIngame(player);//add to match
-                this.lastIndexGame = GameRoom.games.get(roomNum).index;
-                player.setMyRoom(GameRoom.games.get(roomNum));
+                this.lastIndexGame = GameRoom.games.get(roomNum).index; // user know last match number for coming back after disconnection
+                player.setMyRoom(GameRoom.games.get(roomNum)); // player must know what match is playing for him :)
                 return;
             }
-
         }
         GameRoom newGame = new GameRoom();
         newGame.players.add(player); // add to match
@@ -77,6 +76,6 @@ public class User implements Runnable{
     public void run() {
         //todo
         //فعلا برای  راحتی کار و اینکه منو نداریم یه ضرب می رود تو بازی
-
+        joinToRoom();
     }
 }

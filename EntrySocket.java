@@ -13,7 +13,7 @@ public class EntrySocket {
     public void startServer(int port) {
         // starts server and waits for a connection
         try {
-            server = new ServerSocket(5000);
+            server = new ServerSocket(port);
             System.out.println("Server started");
             while (true) {
                 System.out.println("Waiting for a client ...");
