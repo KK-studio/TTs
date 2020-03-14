@@ -61,23 +61,6 @@ public class Player {
     class reciverFromClient implements Runnable {
         @Override
         public void run() {
-
-            //todo send loaction of enemyies
-            String send = "enemyLocation:"; //enemyLocation:amirkashi
-            for (int i = 0; i < myRoom.players.size(); i++) {
-                Player enemy = myRoom.players.get(i);
-                if (enemy.userName != userName) {
-                    send += enemy.userName + ":" + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2] + ";";
-                }
-            }
-            ClientThreads.transmitter(out,send);
-            //todo
-        }
-    }
-
-    class sendToClient implements Runnable {
-        @Override
-        public void run() {
             //place:142.254:54.26:22.11
             String[] parsed = ClientThreads.reader(in).split(";");
             for (String part : parsed) {
@@ -87,6 +70,31 @@ public class Player {
                 }
             }
 
+
+            //todo
+        }
+    }
+
+    class sendToClient implements Runnable {
+        @Override
+        public void run() {
+            //todo send loaction of enemyies  disconnection is not handled now
+            while (true) {
+                try {
+                    Thread.sleep(50);
+                    String send = "enemyLocation:"; //enemyLocation:amirkashi:142.25;154.567
+                    for (int i = 0; i < myRoom.players.size(); i++) {
+                        Player enemy = myRoom.players.get(i);
+                        if (enemy.userName != userName) {
+                            send += enemy.userName + ":" + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2] + ";";
+                        }
+                    }
+                    ClientThreads.transmitter(out, send);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
             //todo
         }
