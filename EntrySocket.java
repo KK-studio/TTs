@@ -48,7 +48,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
     @Override
     public void run() {
         //in this section check user and pass and make User or find it in list
-        String[] startTalk = reader(input).split(";");   //   login;user;pass   => eg : login;amirkashi;123456
+        String[] startTalk = reader(input).split(";");   // todo send  //   login;user;pass   => eg : login;amirkashi;123456
         if (checkUserAndAdd(startTalk[1], startTalk[2]) == null) {
             try {
                 transmitter(output, "WrongLogin");
