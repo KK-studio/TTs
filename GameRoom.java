@@ -23,7 +23,8 @@ public class GameRoom {
     }
 
     public void addUserIngame(Player player ){
-
+        this.players.add(player);
+        System.out.println("added to existed room");
     }
 
     public void spawnFire() {

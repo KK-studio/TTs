@@ -44,7 +44,14 @@ public class Player {
         //todo refactor
         String firstMassage = ClientThreads.reader(in); //amirkashi;p:1.254:2.65:3.65
         //الان فرض شده که نقطه ی اولیه رو کلاینت می گه فعلا برای تست هستش
+
+
+
+
         String[] parts = firstMassage.split(";")[1].split(":");  // todo recive  //amirkashi;position:1.254:2.65:3.65
+
+
+
         setPositionWithStr(parts, vector3_pos);
 
 
@@ -62,15 +69,17 @@ public class Player {
         @Override
         public void run() {
 
-            String[] parsed = ClientThreads.reader(in).split(";");
-            for (String part : parsed) {
-                String[] segment = part.split(":");
-                if (segment[0].equals("place")) {
-                    setPositionWithStr(segment, vector3_pos); //todo receive // place:142.254:54.26:22.11
+
+            while (true) {
+
+                String[] parsed = ClientThreads.reader(in).split(";");
+                for (String part : parsed) {
+                    String[] segment = part.split(":");
+                    if (segment[0].equals("place")) {
+                        setPositionWithStr(segment, vector3_pos); //todo receive // place:142.254:54.26:22.11
+                    }
                 }
             }
-
-
             //todo
         }
     }
@@ -82,11 +91,11 @@ public class Player {
             while (true) {
                 try {
                     Thread.sleep(50);
-                    String send = "enemyLocation:"; //todo send // enemyLocation:amirkashi:45.45:142.25:154.567;
+                    String send = "enemyLocation"; //todo send // enemyLocation:amirkashi:45.45:142.25:154.567;
                     for (int i = 0; i < myRoom.players.size(); i++) {
                         Player enemy = myRoom.players.get(i);
                         if (!enemy.userName.equals(userName) ) {
-                            send += enemy.userName + ":" + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2];
+                            send += ":"+enemy.userName + ":" + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2];
                         }
                     }
                     send += ";";
