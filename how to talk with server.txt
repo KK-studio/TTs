@@ -1,0 +1,25 @@
+
+syntax for communication with server :
+
+rules:
+    all rules finished with !
+    hierarchy of symbols:
+        1 ;
+        2 ,
+        3 :
+
+for login:
+    send:
+        "log";user;pass  eg => log;amirkashi;147258!
+    response:
+        "wrong!"  / or / "accepted!"
+
+
+for send client Transform:
+    send:
+        "trf";vector3Position;Vector3rotation  eg =>  trf;12.45:49.45:58.48;16.254:78.5:878.5!
+
+for enemy location:
+    receive"
+        "enLock";enemyName:VectorPos:VectorRot,enemyName:vectorPos:VectorRot!
+

@@ -85,10 +85,11 @@ public class Player {
                     String send = "enemyLocation:"; //todo send // enemyLocation:amirkashi:45.45:142.25:154.567;
                     for (int i = 0; i < myRoom.players.size(); i++) {
                         Player enemy = myRoom.players.get(i);
-                        if (enemy.userName != userName) {
-                            send += enemy.userName + ":" + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2] + ";";
+                        if (!enemy.userName.equals(userName) ) {
+                            send += enemy.userName + ":" + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2];
                         }
                     }
+                    send += ";";
                     ClientThreads.transmitter(out, send);
 
                 } catch (InterruptedException e) {

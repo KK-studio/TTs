@@ -52,7 +52,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
         if (checkUserAndAdd(startTalk[1], startTalk[2]) == null) {
             try {
                 transmitter(output, "WrongLogin");
-                System.out.println("wrong login");
+                System.out.println("wronglogin");
                 input.close();
                 output.close();
                 socket.close();
