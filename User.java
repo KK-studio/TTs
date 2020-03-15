@@ -65,7 +65,8 @@ public class User implements Runnable{
             }
         }
         GameRoom newGame = new GameRoom();
-        newGame.players.add(player); // add to match
+        newGame.players.add(player);
+        newGame.addUserIngame(player);// add to match
         this.lastIndexGame = newGame.index;
         player.setMyRoom(newGame);
         return;
