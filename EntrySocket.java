@@ -114,9 +114,10 @@ class ClientThreads implements Runnable { // this class use just for making thre
         return out;
     }
 
-    private synchronized static String mainReader(DataInputStream in)  { // receiver need to recognize size of input in first of communication
-        try {
-            if(in.available() != 0) {
+    private static String mainReader(DataInputStream in)  { // receiver need to recognize size of input in first of communication
+        synchronized(in) {//inputStream object should be lock not whole method
+            try {
+                if (in.available() != 0) {
                     try {
 
                         int length = in.readInt();
@@ -147,20 +148,23 @@ class ClientThreads implements Runnable { // this class use just for making thre
                         e.printStackTrace();
                         System.out.println("some problem in reading from socket");
                     }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public static void transmitter(DataOutputStream out, String massage) { // server dont say length of massage and client will handle this
-        try {
-            byte[] dataInBytes = massage.getBytes(StandardCharsets.UTF_8);
-            out.write(dataInBytes);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+        synchronized (out) {
+            try {
+                byte[] dataInBytes = massage.getBytes(StandardCharsets.UTF_8);
+                out.write(dataInBytes);
+                out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

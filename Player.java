@@ -1,18 +1,18 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.util.ArrayList;
-import java.util.Vector;
 
 public class Player {
     public String userName;
     public String characterName;
     public int health;
+    public int characterIndex = -1;//chosen character player
     public DataOutputStream out;
     public DataInputStream in;
-
-
+    public String team = null;
+    public int mapIndex; // what map index is player in
     private GameRoom myRoom; //هم room می دونه کیا توش هستن هم player می دونه که با چه room ای کار داره
 
+    public static int minPing = 50;//minimum ping for user -- >TODO will change by server if server was too busy
 
     //Vectors
     private float[] vector3_pos;
@@ -22,6 +22,8 @@ public class Player {
     //threads
     private Thread sendThread;
     private Thread reciveThread;
+
+    private Thread chooseCharacterThread;
 
     public GameRoom getMyRoom() {
         return myRoom;
@@ -42,35 +44,88 @@ public class Player {
 
 
         //todo refactor
-        String firstMassage = ClientThreads.reader(in); //amirkashi;p:1.254:2.65:3.65
+       // String firstMassage = ClientThreads.reader(in); //amirkashi;p:1.254:2.65:3.65
         //الان فرض شده که نقطه ی اولیه رو کلاینت می گه فعلا برای تست هستش
 
 
 
 
-        String[] parts = firstMassage.split(";")[1].split(":");  // todo recive  //amirkashi;position:1.254:2.65:3.65
+       // String[] parts = firstMassage.split(";")[1].split(":");  // todo recive  //amirkashi;position:1.254:2.65:3.65
 
 
 
-        setPositionWithStr(parts, vector3_pos);
+       // setPositionWithStr(parts, vector3_pos);
 
 
-        sendThread = new Thread(new sendToClient());
-        reciveThread = new Thread(new reciverFromClient());
-        sendThread.start();
-        reciveThread.start();
-        System.out.println("send and receive thread is created for" + userName);
+
 
 
     }
 
+    //we choose when to start thread for start transfering data (when room is full)
+    public void startChooseCharacterSceneThread(){
+        chooseCharacterThread = new Thread(new chooseCharacterScence());
+        chooseCharacterThread.start();
+        System.out.println("send and receive thread for choosing character scene is created for" + userName);
+    }
 
-    class reciverFromClient implements Runnable {
+    public void startInGameThreads(){
+
+
+
+        //building in game threads
+        sendThread = new Thread(new inGameSender());
+        reciveThread = new Thread(new inGameSceneReceiver());
+        sendThread.start();
+        reciveThread.start();
+        System.out.println("send and receive in game round thread is created for" + userName);
+    }
+   private class chooseCharacterScence implements Runnable{
+
         @Override
         public void run() {
 
+            ClientThreads.transmitter(out,"choose op!");//tell client to start choose character scene
+            //this while will run until time for choosing ops finishes
+            while (myRoom.currentState == 1){
+                String[] parsed = ClientThreads.reader(in).split(";");
 
-            while (true) {
+                    if (parsed[0].equals("char")) { //player choosed character
+                        int chooseCharacter = Integer.parseInt(parsed[1]);
+                        boolean check = true;
+                        for (int i = 0; i < myRoom.players.size(); i++) {
+                            Player friend = myRoom.players.get(i);
+                            if (!friend.userName.equals(userName) && friend.team.equals(team)) {
+                                if(friend.characterIndex != -1 && friend.characterIndex == chooseCharacter){
+                                    check = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if(check){//it is valid too choose character
+                            characterIndex = chooseCharacter;
+                            ClientThreads.transmitter(out, "accepted char!");
+                        }
+                        else {
+                            ClientThreads.transmitter(out, "wrong char!");
+                        }
+                    }
+                try {
+                    Thread.sleep(minPing);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
+
+    class inGameSceneReceiver implements Runnable {
+        @Override
+        public void run() {
+
+            while (myRoom.currentState == 3) {
 
                 String[] parsed = ClientThreads.reader(in).split(";");
                 for (String part : parsed) {
@@ -79,18 +134,27 @@ public class Player {
                         setPositionWithStr(segment, vector3_pos); //todo receive // place:142.254:54.26:22.11
                     }
                 }
+                try {
+                    Thread.sleep(minPing);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             //todo
         }
     }
 
-    class sendToClient implements Runnable {
+    class inGameSender implements Runnable {
         @Override
         public void run() {
+
+            //tell client to start game scene
+            ClientThreads.transmitter(out,"start!");
+
             //todo send loaction of enemyies  disconnection is not handled now
-            while (true) {
+            while (myRoom.currentState == 3) {//this while is when player goes into match and plays
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(minPing);
                     String send = "enemyLocation"; //todo send // enemyLocation:amirkashi:45.45:142.25:154.567;
                     for (int i = 0; i < myRoom.players.size(); i++) {
                         Player enemy = myRoom.players.get(i);
@@ -106,6 +170,8 @@ public class Player {
                 }
             }
 
+            //tell client to end game scene
+            ClientThreads.transmitter(out,"yield!");
             //todo
         }
     }
