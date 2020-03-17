@@ -19,7 +19,38 @@ for send client Transform:
     send:
         "trf";vector3Position;Vector3rotation  eg =>  trf;12.45:49.45:58.48;16.254:78.5:878.5!
 
-for enemy location:
+for enemy position:
     receive"
-        "enLock";enemyName:VectorPos:VectorRot,enemyName:vectorPos:VectorRot!
+        "enpos";enemyName:VectorPos:VectorRot,enemyName:vectorPos:VectorRot!
+
+for choose character
+send :
+       "char";characterIndex	eg => char;1! 
+response :
+	"wrong char!"  / or / "accepted char!"
+recieve :
+       "char";playerName;characterIndex   eg => char;dan;1! 
+
+
+on game room builded --> after max players join
+send:
+      "room";mapIndex;team;friendsName;enemiesName  eg =>  room;12;blue;kash,amas;gm,morty,lop!
+
+
+for start scene choose character
+send :
+       "choose op!"
+
+for start round
+send :
+       "start!"
+
+for end round
+send :
+       "yield!"
+
+for end game
+send :
+       "end!"
+
 

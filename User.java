@@ -1,9 +1,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 
 //structure
@@ -61,6 +59,9 @@ public class User implements Runnable{
                 GameRoom.games.get(roomNum).addUserIngame(player);//add to match
                 this.lastIndexGame = GameRoom.games.get(roomNum).index; // user know last match number for coming back after disconnection
                 player.setMyRoom(GameRoom.games.get(roomNum)); // player must know what match is playing for him :)
+                if(GameRoom.sizeRoom == GameRoom.games.get(roomNum).players.size()){//check if room is full
+                    GameRoom.games.get(roomNum).enablePlayersThread();
+                }
                 return;
             }
         }
