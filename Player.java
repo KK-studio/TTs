@@ -177,9 +177,9 @@ public class Player {
     }
 
     public void setPositionWithStr(String floatText[], float[] positions) {//position:1:2:2
-        vector3_pos[0] = Float.parseFloat(floatText[1]);
-        vector3_pos[1] = Float.parseFloat(floatText[2]);
-        vector3_pos[2] = Float.parseFloat(floatText[3]);
+        positions[0] = Float.parseFloat(floatText[1]);
+        positions[1] = Float.parseFloat(floatText[2]);
+        positions[2] = Float.parseFloat(floatText[3]);
     }
 
 
