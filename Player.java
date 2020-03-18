@@ -9,7 +9,7 @@ public class Player {
     public DataOutputStream out;
     public DataInputStream in;
     public String team = null;
-    public int mapIndex; // what map index is player in
+
     private GameRoom myRoom; //هم room می دونه کیا توش هستن هم player می دونه که با چه room ای کار داره
 
     public static int minPing = 50;//minimum ping for user -- >TODO will change by server if server was too busy
