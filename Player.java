@@ -189,11 +189,13 @@ public class Player {
         }
     }
 
+
     public void setPositionWithStr(String floatText[],String rotationText) {//position:1:2:2
         vector3_pos[0] = Float.parseFloat(floatText[0]);
         vector3_pos[1] = Float.parseFloat(floatText[1]);
         vector3_pos[2] = Float.parseFloat(floatText[2]);
         rotation = Float.parseFloat(rotationText);
+
     }
 
 
