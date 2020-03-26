@@ -59,7 +59,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
 
         if (checkUserAndAdd(startTalk[1], startTalk[2]) == null) {
             try {
-                transmitter(output, "WrongLogin");
+                transmitter(output, "WrongLogin!");
                 System.out.println("wronglogin");
                 input.close();
                 output.close();
@@ -69,7 +69,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
             }
 
         } else {
-            transmitter(output, "Accepted");
+            transmitter(output, "Accepted!");
             ActiveUserThread(checkUserAndAdd(startTalk[1], startTalk[2]));  // now we run menu thread for user
         }
 
@@ -103,14 +103,20 @@ class ClientThreads implements Runnable { // this class use just for making thre
 
     public static String reader(DataInputStream in){
         String out = mainReader(in);
+        int i=0;
         while (out == null) {
             out = mainReader(in);
             try {
                 TimeUnit.MILLISECONDS.sleep(25); // time to wait for receiving
+                i++;
+                if(i >= 200)
+                    break;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        if(out == null)
+            return "";
         return out;
     }
 
@@ -158,6 +164,7 @@ class ClientThreads implements Runnable { // this class use just for making thre
 
     public static void transmitter(DataOutputStream out, String massage) { // server dont say length of massage and client will handle this
         synchronized (out) {
+            System.out.println("send : "+massage);
             try {
                 byte[] dataInBytes = massage.getBytes(StandardCharsets.UTF_8);
                 out.write(dataInBytes);

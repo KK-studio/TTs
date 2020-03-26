@@ -23,7 +23,7 @@ public class GameRoom {
 
     public static final int maxMapIndex = 1; //how many maps we have
 
-    public static final long choosingCharacterTime = 15000;//mili seconds should wait for players to choose player character
+    public static final long choosingCharacterTime = 1000;//mili seconds should wait for players to choose player character
     public static final long roundTime = 150000;//2 min and half
 
     public static final long maxRoundNumber = 3;
@@ -136,12 +136,20 @@ public class GameRoom {
                         players.get(i).startChooseCharacterSceneThread();//start thread for sending and receiving data in character choose scene
                     }
                     Thread.sleep(choosingCharacterTime);//wait for players to choose
+
                     ////-----------------------------------------------------------////
 
 
                     ////-------------------- state = 2-----------------------------////
                     currentState = 2;//TODO sending important data before starting game scene
                     //TODO some data here...(ex choose random character for player who didnt choose)
+
+                    for (int i=0;i<players.size();i++){
+                        Player player = players.get(i);
+                        while (!player.characterChooseFinished){//wait to send and recieve last data
+                            Thread.sleep(50);
+                        }
+                    }
 
                     ////-----------------------------------------------------------////
 
