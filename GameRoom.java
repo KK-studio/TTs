@@ -16,33 +16,39 @@ public class GameRoom {
     public ArrayList<Player> redTeamPlayers;
     public int currentState = 0 ; //shows game started or not /// 0 => not completed players ; 1=> in menu ;2=>building map scene;3 => in game  ;4 => finished
     public int round = 1;//which round is player in
+    public int mapIndex = 0; // what map index is game room playing
 
     public static final String teamRed = "red";
-    public static final String teamBlue = "red";
+    public static final String teamBlue = "blue";
 
-    public static final int maxMapIndex = 3; //how many maps we have
+    public static final int maxMapIndex = 1; //how many maps we have
 
-    public static final long choosingCharacterTime = 15000;//mili seconds should wait for players to choose player character
+    public static final long choosingCharacterTime = 1000;//mili seconds should wait for players to choose player character
     public static final long roundTime = 150000;//2 min and half
 
     public static final long maxRoundNumber = 3;
 
-
+    private Thread gameRoomManager;
     public GameRoom() {
         maxIndex++;
         index = maxIndex;
         players = new ArrayList<Player>();
+        redTeamPlayers = new ArrayList<Player>();
+        blueTeamPlayers = new ArrayList<Player>();
         currentState = 0;
         games.put(index , this);
 //        gameThreads = new ArrayList<>();
     }
 
     public void addUserIngame(Player player ){
-        System.out.println("added to existed room");
         this.players.add(player);
+        if(sizeRoom == players.size()){//check if room is full
+            enablePlayersThread();
+        }
     }
 
     public void enablePlayersThread(){
+        System.out.println("setting initial values");
         //enable all player's threads and set initial values and making team members
 
         Random rand = new Random();//TODO later we may have squads
@@ -53,7 +59,8 @@ public class GameRoom {
              team2 = teamBlue;
         }
 
-        int choosenMap = rand.nextInt()%maxMapIndex;
+        mapIndex = rand.nextInt()%maxMapIndex;
+
         for (int i=0;i<sizeRoom/2;i++){
             players.get(i).team = team1;
         }
@@ -68,8 +75,11 @@ public class GameRoom {
             else {
                 blueTeamPlayers.add(players.get(i));
             }
-            players.get(i).mapIndex = choosenMap;
         }
+        System.out.println("starting Game loop thread for game room :"+index);
+
+        gameRoomManager = new Thread(new GameRoomManager());
+        gameRoomManager.start();
     }
 
     public void spawnFire() {
@@ -80,7 +90,7 @@ public class GameRoom {
         //todo
     }
 
-    class gameRoomManager implements Runnable{
+    class GameRoomManager implements Runnable{
 
         @Override
         public void run() {
@@ -109,10 +119,11 @@ public class GameRoom {
                         }
 
                     }
+                    if(friends.length() != 0)
                     friends = friends.substring(0,friends.length()-1);
                     enemies = enemies.substring(0,enemies.length()-1);
 
-                    String send = "room;"+maxIndex+";"+player.team+";"+ friends+";"+enemies+"!";
+                    String send = "room;"+mapIndex+";"+player.team+";"+ friends+";"+enemies+"!";
                     ClientThreads.transmitter(outputStream,send);
                 }
 
@@ -125,12 +136,20 @@ public class GameRoom {
                         players.get(i).startChooseCharacterSceneThread();//start thread for sending and receiving data in character choose scene
                     }
                     Thread.sleep(choosingCharacterTime);//wait for players to choose
+
                     ////-----------------------------------------------------------////
 
 
                     ////-------------------- state = 2-----------------------------////
                     currentState = 2;//TODO sending important data before starting game scene
                     //TODO some data here...(ex choose random character for player who didnt choose)
+
+                    for (int i=0;i<players.size();i++){
+                        Player player = players.get(i);
+                        while (!player.characterChooseFinished){//wait to send and recieve last data
+                            Thread.sleep(50);
+                        }
+                    }
 
                     ////-----------------------------------------------------------////
 

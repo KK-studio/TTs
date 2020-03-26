@@ -56,17 +56,15 @@ public class User implements Runnable{
         //می شود برای پیدا کردن بازی خالی با اضافه کردن صف اضاف مدت زمان را پایین آورد
         for (Integer roomNum : GameRoom.games.keySet()) {  //check that we have empty space in games or not
             if (GameRoom.games.get(roomNum).currentState == 0 && GameRoom.sizeRoom > GameRoom.games.get(roomNum).players.size()) {
+                System.out.println("added to existed room");
                 GameRoom.games.get(roomNum).addUserIngame(player);//add to match
                 this.lastIndexGame = GameRoom.games.get(roomNum).index; // user know last match number for coming back after disconnection
                 player.setMyRoom(GameRoom.games.get(roomNum)); // player must know what match is playing for him :)
-                if(GameRoom.sizeRoom == GameRoom.games.get(roomNum).players.size()){//check if room is full
-                    GameRoom.games.get(roomNum).enablePlayersThread();
-                }
                 return;
             }
         }
         GameRoom newGame = new GameRoom();
-        newGame.players.add(player); // add to match
+        newGame.addUserIngame(player);// add to match
         this.lastIndexGame = newGame.index;
         player.setMyRoom(newGame);
         return;

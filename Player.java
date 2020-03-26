@@ -6,17 +6,18 @@ public class Player {
     public String characterName;
     public int health;
     public int characterIndex = -1;//chosen character player
+
     public DataOutputStream out;
     public DataInputStream in;
     public String team = null;
-    public int mapIndex; // what map index is player in
+
     private GameRoom myRoom; //هم room می دونه کیا توش هستن هم player می دونه که با چه room ای کار داره
 
     public static int minPing = 50;//minimum ping for user -- >TODO will change by server if server was too busy
 
     //Vectors
     private float[] vector3_pos;
-    private float[] vector3_rotation;
+    private float rotation;
 
 
     //threads
@@ -24,6 +25,7 @@ public class Player {
     private Thread reciveThread;
 
     private Thread chooseCharacterThread;
+    public boolean characterChooseFinished = false;
 
     public GameRoom getMyRoom() {
         return myRoom;
@@ -36,7 +38,7 @@ public class Player {
 
     public Player(String userName, DataInputStream in, DataOutputStream out) {
         vector3_pos = new float[3];
-        vector3_rotation = new float[3];
+
         this.userName = userName;
         this.characterName = null;
         this.in = in;
@@ -66,7 +68,7 @@ public class Player {
     public void startChooseCharacterSceneThread(){
         chooseCharacterThread = new Thread(new chooseCharacterScence());
         chooseCharacterThread.start();
-        System.out.println("send and receive thread for choosing character scene is created for" + userName);
+        System.out.println("send and receive thread for choosing character scene is created for " + userName);
     }
 
     public void startInGameThreads(){
@@ -84,30 +86,40 @@ public class Player {
 
         @Override
         public void run() {
+            characterChooseFinished = false;
 
             ClientThreads.transmitter(out,"choose op!");//tell client to start choose character scene
             //this while will run until time for choosing ops finishes
             while (myRoom.currentState == 1){
-                String[] parsed = ClientThreads.reader(in).split(";");
+                String[] parsed1 = ClientThreads.reader(in).split("!");
+                    for (int j=0;j<parsed1.length;j++) {
+                        String[] parsed = parsed1[j].split(";");
 
-                    if (parsed[0].equals("char")) { //player choosed character
-                        int chooseCharacter = Integer.parseInt(parsed[1]);
-                        boolean check = true;
-                        for (int i = 0; i < myRoom.players.size(); i++) {
-                            Player friend = myRoom.players.get(i);
-                            if (!friend.userName.equals(userName) && friend.team.equals(team)) {
-                                if(friend.characterIndex != -1 && friend.characterIndex == chooseCharacter){
-                                    check = false;
-                                    break;
+                        if (parsed[0].equals("char")) { //player choosed character
+                            int chooseCharacter = Integer.parseInt(parsed[1]);
+                            boolean check = true;
+                            for (int i = 0; i < myRoom.players.size(); i++) {
+                                Player friend = myRoom.players.get(i);
+                                if (!friend.userName.equals(userName) && friend.team.equals(team)) {
+                                    if (friend.characterIndex != -1 && friend.characterIndex == chooseCharacter) {
+                                        check = false;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if(check){//it is valid too choose character
-                            characterIndex = chooseCharacter;
-                            ClientThreads.transmitter(out, "accepted char!");
-                        }
-                        else {
-                            ClientThreads.transmitter(out, "wrong char!");
+                            if (check) {//it is valid too choose character
+                                characterIndex = chooseCharacter;
+                                ClientThreads.transmitter(out, "accepted char!");
+                                //now send every one else what he chose
+                                for (int i = 0; i < myRoom.players.size(); i++) {
+                                    Player other = myRoom.players.get(i);
+                                    if (!other.userName.equals(userName)) {
+                                        ClientThreads.transmitter(other.out, "char;" + userName + ";" + characterIndex + "!");
+                                    }
+                                }
+                            } else {
+                                ClientThreads.transmitter(out, "wrong char!");
+                            }
                         }
                     }
                 try {
@@ -116,7 +128,7 @@ public class Player {
                     e.printStackTrace();
                 }
             }
-
+            characterChooseFinished = true;
         }
     }
 
@@ -126,18 +138,19 @@ public class Player {
         public void run() {
 
             while (myRoom.currentState == 3) {
-
-                String[] parsed = ClientThreads.reader(in).split(";");
-                for (String part : parsed) {
-                    String[] segment = part.split(":");
-                    if (segment[0].equals("place")) {
-                        setPositionWithStr(segment, vector3_pos); //todo receive // place:142.254:54.26:22.11
+                String[] parsed1 = ClientThreads.reader(in).split("!");
+                for (int i=0;i<parsed1.length;i++) {
+                    String[] parsed = parsed1[i].split(";");
+                    if(parsed[0].equals("trf")) {
+                        String[] segment = parsed[1].split(":");
+                            setPositionWithStr(segment, parsed[2]); //todo receive // place:142.254:54.26:22.11
                     }
-                }
-                try {
-                    Thread.sleep(minPing);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+
+                    try {
+                        Thread.sleep(minPing);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             //todo
@@ -155,14 +168,14 @@ public class Player {
             while (myRoom.currentState == 3) {//this while is when player goes into match and plays
                 try {
                     Thread.sleep(minPing);
-                    String send = "enemyLocation"; //todo send // enemyLocation:amirkashi:45.45:142.25:154.567;
+                    String send = "enpos;"; //todo send // enemyLocation:amirkashi:45.45:142.25:154.567;
                     for (int i = 0; i < myRoom.players.size(); i++) {
                         Player enemy = myRoom.players.get(i);
                         if (!enemy.userName.equals(userName) ) {
-                            send += ":"+enemy.userName + ":" + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2];
+                            send += enemy.userName + "," + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2]+","+enemy.rotation+",";
                         }
                     }
-                    send += ";";
+                    send = send.substring(0,send.length()-1) + "!";
                     ClientThreads.transmitter(out, send);
 
                 } catch (InterruptedException e) {
@@ -176,10 +189,11 @@ public class Player {
         }
     }
 
-    public void setPositionWithStr(String floatText[], float[] positions) {//position:1:2:2
-        vector3_pos[0] = Float.parseFloat(floatText[1]);
-        vector3_pos[1] = Float.parseFloat(floatText[2]);
-        vector3_pos[2] = Float.parseFloat(floatText[3]);
+    public void setPositionWithStr(String floatText[],String rotationText) {//position:1:2:2
+        vector3_pos[0] = Float.parseFloat(floatText[0]);
+        vector3_pos[1] = Float.parseFloat(floatText[1]);
+        vector3_pos[2] = Float.parseFloat(floatText[2]);
+        rotation = Float.parseFloat(rotationText);
     }
 
 

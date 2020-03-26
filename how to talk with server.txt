@@ -17,11 +17,11 @@ for login:
 
 for send client Transform:
     send:
-        "trf";vector3Position;Vector3rotation  eg =>  trf;12.45:49.45:58.48;16.254:78.5:878.5!
+        "trf";vector3Position;rotation  eg =>  trf;12.45:49.45:58.48;67.5!
 
-for enemy position:
+for enemy transform:
     receive"
-        "enpos";enemyName:VectorPos:VectorRot,enemyName:vectorPos:VectorRot!
+        "enpos";enemyName,VectorPos,rotation,enemyName,vectorPos,rotation:! eg => enpos;ali,12.45:49.45:58.48,67.5,12.5,asghar...!
 
 for choose character
 send :
