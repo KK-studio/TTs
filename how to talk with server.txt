@@ -54,3 +54,23 @@ send :
        "end!"
 
 
+
+
+
+///////////////////////////////////////// UDP ////////////////////////////////////////////
+    all massage start with username; ...
+        eg =>  amirkashi;....
+    !!! never send "bye" to udp server it will drop all options in receiver
+
+
+
+
+    request for join to game  username;join
+        eg => amirkashi;join
+
+
+
+
+
+
+

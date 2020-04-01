@@ -15,9 +15,14 @@ public class Main {
 //        for (String name:test.keySet() ) {
 //            System.out.println(((User)test.get(name)).name);
 //
-//        }
+//        ]
+
+        Thread udp = new Thread(new Udp());
+        udp.start();
         EntrySocket entrySocket = new EntrySocket();
         entrySocket.startServer(5000);
+
+
 
 	// write your code here
     }

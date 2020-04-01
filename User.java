@@ -1,5 +1,6 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,8 +52,8 @@ public class User implements Runnable{
 
 
 
-    public synchronized void joinToRoom() {  //join is synchronous because prevent some problems start of match making
-        player = new Player(name,input,output);
+    public synchronized void joinToRoom(InetAddress ip , int port) {  //join is synchronous because prevent some problems start of match making
+        player = new Player(name,input,output,ip,port);
         //می شود برای پیدا کردن بازی خالی با اضافه کردن صف اضاف مدت زمان را پایین آورد
         for (Integer roomNum : GameRoom.games.keySet()) {  //check that we have empty space in games or not
             if (GameRoom.games.get(roomNum).currentState == 0 && GameRoom.sizeRoom > GameRoom.games.get(roomNum).players.size()) {
@@ -75,6 +76,7 @@ public class User implements Runnable{
     public void run() {
         //todo
         //فعلا برای  راحتی کار و اینکه منو نداریم یه ضرب می رود تو بازی
-        joinToRoom();
+         //joinToRoom();
+         //برای ورود به بازی باید به سیستم  udp یک پیام بدهید
     }
 }
