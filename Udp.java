@@ -27,10 +27,12 @@ public class Udp implements Runnable{
     public void run() {
         try {
         // Step 1 : Create a socket to listen at port 1234
-        DatagramSocket ds = new DatagramSocket(4321);
         byte[] receive = new byte[2048];
         DatagramPacket DpReceive = null;
+        DatagramSocket ds = new DatagramSocket(7979);
         while (true) {
+
+
             receive = new byte[2048];
             // Step 2 : create a DatgramPacket to receive the data.
             DpReceive = new DatagramPacket(receive, receive.length);
@@ -40,11 +42,13 @@ public class Udp implements Runnable{
 
             System.out.println("Client:-" + data(receive));
             taskHandler(data(receive).toString(),DpReceive);
+//            broadcastSystem("wtfff man "+data(receive),DpReceive.getAddress(),5030);
             // Exit the server if the client sends "bye"
             if (data(receive).toString().equals("bye")) {
                 System.out.println("Client sent bye.....EXITING");
                 break;
             }
+//            ds.close();
             // Clear the buffer after every message.
             try {
                 Thread.sleep(9);
@@ -67,7 +71,7 @@ public class Udp implements Runnable{
                 if (player != null) {
                     if(!player.ip.equals(datagramPacket.getAddress())){
                         player.ip = datagramPacket.getAddress();
-                        player.port = datagramPacket.getPort();
+                       // player.port = datagramPacket.getPort();
                     }
                     switch (data[1]) {
                         case "join":
@@ -98,7 +102,7 @@ public class Udp implements Runnable{
             byte buf[] = null;
 
             // loop while user not enters "bye"
-            while (true) {
+
 
                 // convert the String input into the byte array.
                 buf = inp.getBytes();
@@ -111,17 +115,18 @@ public class Udp implements Runnable{
                 // Step 3 : invoke the send call to actually send
                 // the data.
                 ds.send(DpSend);
-                System.out.println("to ip " + ip +" data sent :"+inp);
+                //System.out.println("to ip " + ip +" data sent :"+inp);
                 // break the loop if user enters "bye"
-                if (inp.equals("bye"))
-                    break;
-            }
+                ds.close();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            System.out.println("null ip maybe");
         }
     }
 }

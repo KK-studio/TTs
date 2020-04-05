@@ -45,6 +45,7 @@ public class Player {
         vector3_pos = new float[3];
         this.ip = ip;
         this.port = port;
+        System.out.println(userName +" --> "+port);
         this.userName = userName;
         this.characterName = null;
         this.in = in;
