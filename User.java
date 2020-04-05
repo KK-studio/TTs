@@ -1,6 +1,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,8 @@ public class User implements Runnable{
     public Player player = null; // اگر توی بازی نباشه باید null شود
     public DataOutputStream output;
     public DataInputStream input;
-
+    public InetAddress ip ;
+    public int port;
     private String pass;//it will remove when use database
 
 
@@ -33,8 +35,18 @@ public class User implements Runnable{
         users.put(name, this);
     }
 
+    public User(String name, String pass,DataInputStream input , DataOutputStream output,InetAddress ip,int port) {
+        this.name = name;
+        this.pass = pass;
+        this.input = input;
+        this.output = output;
+        this.ip = ip;
+        this.port = port;
+        users.put(name, this);
+    }
+
     public Boolean checkPass(String pass){
-        if(this.pass == pass){
+        if(this.pass.equals(pass)){
             return true;
         }else {
             return false;
@@ -52,7 +64,7 @@ public class User implements Runnable{
 
 
 
-    public synchronized void joinToRoom(InetAddress ip , int port) {  //join is synchronous because prevent some problems start of match making
+    public synchronized void joinToRoom() {  //join is synchronous because prevent some problems start of match making
         player = new Player(name,input,output,ip,port);
         //می شود برای پیدا کردن بازی خالی با اضافه کردن صف اضاف مدت زمان را پایین آورد
         for (Integer roomNum : GameRoom.games.keySet()) {  //check that we have empty space in games or not
@@ -76,7 +88,7 @@ public class User implements Runnable{
     public void run() {
         //todo
         //فعلا برای  راحتی کار و اینکه منو نداریم یه ضرب می رود تو بازی
-         //joinToRoom();
+         joinToRoom();
          //برای ورود به بازی باید به سیستم  udp یک پیام بدهید
     }
 }

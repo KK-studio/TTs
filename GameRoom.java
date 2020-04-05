@@ -76,12 +76,14 @@ public class GameRoom {
                 blueTeamPlayers.add(players.get(i));
             }
         }
-        System.out.println("starting Game loop thread for game room :"+index);
+        startRoom();
+    }
 
+    public void startRoom(){
+        System.out.println("starting Game loop thread for game room :"+index);
         gameRoomManager = new Thread(new GameRoomManager());
         gameRoomManager.start();
     }
-
     public void spawnFire() {
         //todo
     }

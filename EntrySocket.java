@@ -1,7 +1,9 @@
 import javax.xml.crypto.Data;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
@@ -55,9 +57,9 @@ class ClientThreads implements Runnable { // this class use just for making thre
     public void run() {
         //in this section check user and pass and make User or find it in list
 
-        String[] startTalk = reader(input).split(";");   // todo send  //   login;user;pass   => eg : login;amirkashi;123456
+        String[] startTalk = reader(input).split("!")[0].split(";");   // todo send  //   login;user;pass   => eg : login;amirkashi;123456
 
-        if (checkUserAndAdd(startTalk[1], startTalk[2]) == null) {
+        if (checkUserAndAdd(startTalk[1], startTalk[2],startTalk[3],startTalk[4]) == null) {
             try {
                 transmitter(output, "WrongLogin!");
                 System.out.println("wronglogin");
@@ -70,17 +72,25 @@ class ClientThreads implements Runnable { // this class use just for making thre
 
         } else {
             transmitter(output, "Accepted!");
-            ActiveUserThread(checkUserAndAdd(startTalk[1], startTalk[2]));  // now we run menu thread for user
+            ActiveUserThread(checkUserAndAdd(startTalk[1], startTalk[2],startTalk[3],startTalk[4]));  // now we run menu thread for user
         }
 
 
     }
 
 
-    public User checkUserAndAdd(String username, String pass) {
+    public User checkUserAndAdd(String username, String pass,String ip1,String port1) {
         User currnetUser = User.users.get(username);
         if (currnetUser == null) {
-            currnetUser = new User(username, pass, input, output);
+            InetAddress ip = null;
+            try {
+                ip = InetAddress.getByName(ip1);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+            int port = Integer.parseInt(port1);
+
+            currnetUser = new User(username, pass, input, output,ip,port);
             User.users.put(username, currnetUser);
             return currnetUser;
         } else {

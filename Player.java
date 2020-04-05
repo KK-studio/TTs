@@ -121,11 +121,11 @@ public class Player {
                             ClientThreads.transmitter(out, "wrong char!");
                         }
                     }
-                }
-                try {
-                    Thread.sleep(minPing);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    try {
+                        Thread.sleep(minPing);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             characterChooseFinished = true;
@@ -137,6 +137,8 @@ public class Player {
         @Override
         public void run() {
 
+
+            /* TCP
             while (myRoom.currentState == 3) {
                 String[] parsed1 = ClientThreads.reader(in).split("!");
                 for (int i = 0; i < parsed1.length; i++) {
@@ -153,6 +155,7 @@ public class Player {
                     }
                 }
             }
+            */
             //todo
         }
     }
@@ -161,7 +164,7 @@ public class Player {
         @Override
         public void run() {
 
-            //tell client to start game scene
+            //tell client to start game scene should be in tcp
             ClientThreads.transmitter(out, "start!");
 
             //todo send loaction of enemyies  disconnection is not handled now
@@ -176,8 +179,8 @@ public class Player {
                         }
                     }
                     send = send.substring(0, send.length() - 1) + "!";
-                    ClientThreads.transmitter(out, send);
-
+                   // ClientThreads.transmitter(out, send);
+                    Udp.broadcastSystem(send,ip,port);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

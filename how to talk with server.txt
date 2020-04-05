@@ -10,18 +10,10 @@ rules:
 
 for login:
     send:
-        "log";user;pass  eg => log;amirkashi;147258!
+        "log";user;pass;ip;port  eg => log;amirkashi;147258;127.11.2.1;!
     response:
         "wrong!"  / or / "accepted!"
 
-
-for send client Transform:
-    send:
-        "trf";vector3Position;rotation  eg =>  trf;12.45:49.45:58.48;67.5!
-
-for enemy transform:
-    receive"
-        "enpos";enemyName,VectorPos,rotation,enemyName,vectorPos,rotation:! eg => enpos;ali,12.45:49.45:58.48,67.5,12.5,asghar...!
 
 for choose character
 send :
@@ -58,15 +50,23 @@ send :
 
 
 ///////////////////////////////////////// UDP ////////////////////////////////////////////
-    all massage start with username; ...
+    all massage for recieving from  start with username; ...
         eg =>  amirkashi;....
     !!! never send "bye" to udp server it will drop all options in receiver
 
 
+	for send client Transform:
+   	 recieve:
+       "trf";vector3Position;rotation  eg =>  dandan;trf;12.45:49.45:58.48;67.5!
+
+	for enemy transform:
+ 	  send:
+     	 "enpos";enemyName,VectorPos,rotation,enemyName,vectorPos,rotation:! eg => enpos;ali,12.45:49.45:58.48,67.5,12.5,asghar...!
+
 
 
     request for join to game  username;join
-        eg => amirkashi;join
+        eg => amirkashi;join!
 
 
 

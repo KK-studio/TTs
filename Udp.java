@@ -27,11 +27,11 @@ public class Udp implements Runnable{
     public void run() {
         try {
         // Step 1 : Create a socket to listen at port 1234
-        DatagramSocket ds = new DatagramSocket(1234);
+        DatagramSocket ds = new DatagramSocket(4321);
         byte[] receive = new byte[2048];
         DatagramPacket DpReceive = null;
         while (true) {
-
+            receive = new byte[2048];
             // Step 2 : create a DatgramPacket to receive the data.
             DpReceive = new DatagramPacket(receive, receive.length);
 
@@ -39,15 +39,18 @@ public class Udp implements Runnable{
             ds.receive(DpReceive);
 
             System.out.println("Client:-" + data(receive));
-
+            taskHandler(data(receive).toString(),DpReceive);
             // Exit the server if the client sends "bye"
             if (data(receive).toString().equals("bye")) {
                 System.out.println("Client sent bye.....EXITING");
                 break;
             }
-            taskHandler(data(receive).toString(),DpReceive.getAddress(),DpReceive.getPort());
             // Clear the buffer after every message.
-            receive = new byte[2048];
+            try {
+                Thread.sleep(9);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         } catch (SocketException e) {
             e.printStackTrace();
@@ -55,13 +58,32 @@ public class Udp implements Runnable{
             e.printStackTrace();
         }
     }
-    private void   taskHandler(String task , InetAddress ip,int port ){ //وظیفه ای که باید انجام شود در کلمه دوم باید بیان شود و کلمه اول نام هست **
-        String[] taskSplited =  task.split(";");
-        switch (taskSplited[1]){
-            case "join":
-                User.users.get(taskSplited[0]).joinToRoom(ip,port);
-                break;
-                // todo
+    private void   taskHandler(String task,DatagramPacket datagramPacket){ //وظیفه ای که باید انجام شود در کلمه دوم باید بیان شود و کلمه اول نام هست **
+        String[] taskSplited =  task.split("!");
+        for (int i=0;i<taskSplited.length;i++) {
+            String [] data = taskSplited[i].split(";");
+            try {
+                Player player = User.users.get(data[0]).player;
+                if (player != null) {
+                    if(!player.ip.equals(datagramPacket.getAddress())){
+                        player.ip = datagramPacket.getAddress();
+                        player.port = datagramPacket.getPort();
+                    }
+                    switch (data[1]) {
+                        case "join":
+                            // User.users.get(taskSplited[0]).joinToRoom(ip,port);
+                            break;
+                        case "trf":
+                            String[] segment = data[2].split(":");
+                            player.setPositionWithStr(segment, data[3]);
+                            break;
+                        // todo
+                    }
+                }
+            }
+            catch (NullPointerException e){
+                System.out.println("null pish miad");
+            }
         }
     }
 
@@ -89,7 +111,7 @@ public class Udp implements Runnable{
                 // Step 3 : invoke the send call to actually send
                 // the data.
                 ds.send(DpSend);
-
+                System.out.println("to ip " + ip +" data sent :"+inp);
                 // break the loop if user enters "bye"
                 if (inp.equals("bye"))
                     break;
