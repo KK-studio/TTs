@@ -24,7 +24,7 @@ public class GameRoom {
     public static final int maxMapIndex = 1; //how many maps we have
 
     public static final long choosingCharacterTime = 1000;//mili seconds should wait for players to choose player character
-    public static final long roundTime = 150000;//2 min and half
+    public static final long roundTime = 1500000;//2 min and half
 
     public static final long maxRoundNumber = 3;
 

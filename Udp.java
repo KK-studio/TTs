@@ -33,7 +33,7 @@ public class Udp implements Runnable{
         while (true) {
 
 
-            receive = new byte[2048];
+            receive = new byte[256];
             // Step 2 : create a DatgramPacket to receive the data.
             DpReceive = new DatagramPacket(receive, receive.length);
 
@@ -78,6 +78,7 @@ public class Udp implements Runnable{
                             // User.users.get(taskSplited[0]).joinToRoom(ip,port);
                             break;
                         case "trf":
+                            System.out.println("done");
                             String[] segment = data[2].split(":");
                             player.setPositionWithStr(segment, data[3]);
                             break;
@@ -115,7 +116,7 @@ public class Udp implements Runnable{
                 // Step 3 : invoke the send call to actually send
                 // the data.
                 ds.send(DpSend);
-                //System.out.println("to ip " + ip +" data sent :"+inp);
+                System.out.println("to ip " + ip +" data sent :"+inp);
                 // break the loop if user enters "bye"
                 ds.close();
         } catch (UnknownHostException e) {

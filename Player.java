@@ -16,9 +16,10 @@ public class Player {
     public DataInputStream in;
     public String team = null;
 
+    public boolean newTransform = false;
     private GameRoom myRoom; //هم room می دونه کیا توش هستن هم player می دونه که با چه room ای کار داره
 
-    public static int minPing = 50;//minimum ping for user -- >TODO will change by server if server was too busy
+    public static int minPing = 9;//minimum ping for user -- >TODO will change by server if server was too busy
 
     //Vectors
     private float[] vector3_pos;
@@ -167,21 +168,26 @@ public class Player {
 
             //tell client to start game scene should be in tcp
             ClientThreads.transmitter(out, "start!");
+            boolean check = false;
 
             //todo send loaction of enemyies  disconnection is not handled now
             while (myRoom.currentState == 3) {//this while is when player goes into match and plays
+                check = false;
                 try {
-                    Thread.sleep(minPing);
-                    String send = "enpos;"; //todo send // enemyLocation:amirkashi:45.45:142.25:154.567;
-                    for (int i = 0; i < myRoom.players.size(); i++) {
-                        Player enemy = myRoom.players.get(i);
-                        if (!enemy.userName.equals(userName)) {
-                            send += enemy.userName + "," + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2] + "," + enemy.rotation + ",";
+                        Thread.sleep(minPing);
+                        String send = "enpos;"; //todo send // enemyLocation:amirkashi:45.45:142.25:154.567;
+                        for (int i = 0; i < myRoom.players.size(); i++) {
+                            Player enemy = myRoom.players.get(i);
+                            if (!enemy.userName.equals(userName) && enemy.newTransform) {
+                                send += enemy.userName + "," + enemy.vector3_pos[0] + ":" + enemy.vector3_pos[1] + ":" + enemy.vector3_pos[2] + "," + enemy.rotation + ",";
+                                check = true;
+                                enemy.newTransform = false;
+                            }
                         }
-                    }
-                    send = send.substring(0, send.length() - 1) + "!";
-                   // ClientThreads.transmitter(out, send);
-                    Udp.broadcastSystem(send,ip,port);
+                        send = send.substring(0, send.length() - 1) + "!";
+                        // ClientThreads.transmitter(out, send);
+                    if(check)
+                        Udp.broadcastSystem(send, ip, port);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -199,7 +205,7 @@ public class Player {
         vector3_pos[1] = Float.parseFloat(floatText[1]);
         vector3_pos[2] = Float.parseFloat(floatText[2]);
         rotation = Float.parseFloat(rotationText);
-
+        newTransform = true;
     }
 
 
